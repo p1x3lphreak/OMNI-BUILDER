@@ -27,13 +27,24 @@ jobs:
           node-version: 20
           cache: 'npm'
 
-      - name: Install
-        run: npm ci
+      # Work around npm optional-deps bug (rollup native bin)
+      - name: Upgrade npm (fixes npm#4828 class of issues)
+        run: npm i -g npm@latest
+
+      - name: Install dependencies (robust)
+        run: |
+          rm -rf node_modules
+          # Try ci first for speed; if it hits the rollup optional-deps bug, fall back
+          npm ci || (echo "npm ci failed on optional deps; retrying with npm install" && rm -f package-lock.json && npm install --no-audit --no-fund)
+
+      - name: Set build metadata env
+        run: |
+          echo "VITE_BUILD_TIME=$(date -u +'%Y-%m-%dT%H:%M:%SZ')" >> $GITHUB_ENV
+          echo "VITE_COMMIT_SHORT=${GITHUB_SHA::7}" >> $GITHUB_ENV
 
       - name: Build
         run: npm run build
 
-      # Belt & suspenders: ensure SPA 404 ships even if config changes later
       - name: Ensure SPA 404 present
         run: |
           mkdir -p dist
