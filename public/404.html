@@ -1,13 +1,18 @@
 <!doctype html>
 <html>
   <head>
+    <meta charset="utf-8" />
+    <!-- Immediate redirect back to the app root under the repo path -->
     <meta http-equiv="refresh" content="0; url=/OMNI-BUILDER/" />
     <script>
-      // Preserve the path for client routers
-      const redirect = '/OMNI-BUILDER/' + (location.pathname + location.search + location.hash)
-        .replace(/^\/OMNI-BUILDER\//,'');
-      sessionStorage.setItem('gh-spa-path', redirect);
-      window.location.href = '/OMNI-BUILDER/';
+      (function () {
+        var prefix = "/OMNI-BUILDER/";
+        var full = location.pathname + location.search + location.hash;
+        // strip the repo prefix if it's already present (double-prefix guard)
+        var cleaned = full.replace(new RegExp("^" + prefix.replace(/\//g, "\\/")), "");
+        sessionStorage.setItem("gh-spa-path", prefix + cleaned.replace(/^\/+/, ""));
+        location.replace(prefix);
+      })();
     </script>
   </head>
   <body></body>

@@ -8,13 +8,13 @@ yarn-error.log*
 dist/
 *.local
 
-# Editor cruft
+# Editor/OS
 .DS_Store
 *.swp
 *.swo
 .idea/
 .vscode/
 
-# Env files
+# Env
 .env
 .env.*
