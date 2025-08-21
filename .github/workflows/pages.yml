@@ -18,7 +18,7 @@ jobs:
   build:
     runs-on: ubuntu-latest
     env:
-      # 👇 Force Rollup to skip native binary & use JS impl (works across npm bugs)
+      # Ensure Rollup never tries to load a native binary on CI
       ROLLUP_SKIP_NODE_JS_NATIVE: "true"
     steps:
       - name: Checkout
@@ -28,15 +28,22 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: 20
-          cache: 'npm'
+          cache: "pnpm"
 
-      - name: Upgrade npm (mitigate optional-deps installer bugs)
-        run: npm i -g npm@latest
+      - name: Enable corepack + pnpm
+        run: |
+          corepack enable
+          corepack prepare pnpm@9 --activate
+          pnpm -v
 
-      - name: Fresh install (no lockfile churn)
+      # Clean any npm artifacts so pnpm gets a clean shot
+      - name: Clean npm artifacts
         run: |
           rm -rf node_modules
-          npm ci || (echo "npm ci failed; falling back to npm install" && rm -f package-lock.json && npm install --no-audit --no-fund)
+          rm -f package-lock.json
+
+      - name: Install deps (pnpm)
+        run: pnpm install --no-frozen-lockfile
 
       - name: Set build metadata env
         run: |
@@ -44,7 +51,7 @@ jobs:
           echo "VITE_COMMIT_SHORT=${GITHUB_SHA::7}" >> $GITHUB_ENV
 
       - name: Build
-        run: npm run build
+        run: pnpm run build
 
       - name: Ensure SPA 404 present
         run: |
