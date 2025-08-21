@@ -1,0 +1,179 @@
+/* Tailwind v4 base */
+@import "tailwindcss";
+
+/* -----------------------------
+   Themes (by HTML class)
+--------------------------------*/
+@layer base {
+  :root {
+    --bg: #0a0f0a;
+    --bg2: #0f160f;
+    --bg3: #141c14;
+    --fg: #d2f8d2;
+    --muted: #87a887;
+    --accent: #00ff88;
+    --error: #ff6b6b;
+    --border: #1b2a1b;
+    --mono: 'VT323', ui-monospace, monospace;
+    --radius: 0.5rem;
+    --shadow: 0 1px 2px rgb(0 0 0 / 0.4), 0 8px 24px rgb(0 0 0 / 0.24);
+  }
+  .theme-terminal { /* green CRT */
+    --bg: #050a05;
+    --bg2: #0a110a;
+    --bg3: #0f1a0f;
+    --fg: #b7f5b7;
+    --muted: #73a773;
+    --accent: #39ff14;
+    --error: #ff5c8a;
+    --border: #163116;
+  }
+  .theme-light {
+    --bg: #f6f7f8;
+    --bg2: #ffffff;
+    --bg3: #f0f2f4;
+    --fg: #1f2937;
+    --muted: #6b7280;
+    --accent: #2563eb;
+    --error: #dc2626;
+    --border: #e5e7eb;
+  }
+  .theme-amber { /* amber CRT */
+    --bg: #0f0b05;
+    --bg2: #1a1207;
+    --bg3: #22160a;
+    --fg: #ffd580;
+    --muted: #b8915e;
+    --accent: #ffb000;
+    --error: #ff4444;
+    --border: #332312;
+  }
+
+  html {
+    background: var(--bg);
+    color: var(--fg);
+    font-feature-settings: "calt" 0;
+    font-family: var(--mono);
+    text-shadow: 0 0 6px color-mix(in oklab, var(--accent) 40%, transparent);
+    background-image: repeating-linear-gradient(
+      0deg,
+      rgba(255, 255, 255, 0.02) 0px,
+      rgba(255, 255, 255, 0.02) 2px,
+      transparent 2px,
+      transparent 4px
+    );
+    background-size: 100% 4px;
+  }
+}
+
+/* -----------------------------
+   Component aliases (replaces DaisyUI)
+--------------------------------*/
+@layer components {
+  .navbar { @apply w-full flex items-center border-b border-[var(--border)] bg-[var(--bg2)] px-4 py-3; }
+  .footer { @apply w-full grid gap-4 text-sm; }
+  .footer-center { @apply place-items-center text-center; }
+
+  .card {
+    @apply bg-[var(--bg2)] rounded-[var(--radius)] border border-[var(--border)];
+    box-shadow: var(--shadow);
+    /* CRT scanlines */
+    background-image:
+      repeating-linear-gradient(
+        0deg,
+        rgba(255,255,255,0.03) 0px,
+        rgba(255,255,255,0.03) 2px,
+        transparent 2px,
+        transparent 4px
+      );
+  }
+  .card-body { @apply p-6 flex flex-col gap-2; }
+  .card-title { @apply text-base font-semibold; }
+
+  .btn {
+    @apply inline-flex items-center justify-center px-4 h-10 text-sm font-semibold rounded-md border transition
+           select-none;
+    border-color: var(--border);
+    background: var(--bg3);
+    color: var(--fg);
+  }
+  .btn:hover { filter: brightness(1.1); }
+  .btn:focus-visible { outline: 2px solid color-mix(in oklab, var(--accent) 30%, transparent); outline-offset: 2px; }
+
+  /* Phosphor primary button */
+  .btn-primary {
+    background: color-mix(in oklab, var(--accent) 40%, black);
+    border-color: color-mix(in oklab, var(--accent) 55%, black);
+    color: #0b1b0f; /* darker phosphor text for contrast on neon */
+    text-shadow: 0 0 2px rgba(57,255,20,0.7);
+  }
+  .btn-outline {
+    background: transparent;
+    border-color: color-mix(in oklab, var(--muted) 60%, transparent);
+    color: var(--fg);
+  }
+  .btn-ghost { background: transparent; border-color: transparent; color: var(--fg); }
+  .btn-sm { @apply h-8 px-3 text-xs; }
+  .btn-xs { @apply h-6 px-2 text-[11px]; }
+  .text-error { color: var(--error); }
+
+  .input {
+    @apply w-full h-10 rounded-md px-3 text-sm border bg-[var(--bg3)];
+    border-color: var(--border); color: var(--fg);
+  }
+  .input:focus { outline: 2px solid color-mix(in oklab, var(--accent) 30%, transparent); outline-offset: 2px; }
+  .input-sm { @apply h-8 text-xs; }
+  .input-bordered {}
+
+  .select {
+    @apply w-full h-10 rounded-md px-3 text-sm border bg-[var(--bg3)];
+    border-color: var(--border); color: var(--fg);
+  }
+  .select:focus { outline: 2px solid color-mix(in oklab, var(--accent) 30%, transparent); outline-offset: 2px; }
+
+  .toggle {
+    @apply appearance-none inline-block w-12 h-6 rounded-full relative border cursor-pointer;
+    border-color: var(--border); background: var(--bg3);
+  }
+  .toggle:checked { background: color-mix(in oklab, var(--accent) 35%, black); }
+  .toggle:before {
+    content: ""; @apply absolute top-0.5 left-0.5 w-5 h-5 rounded-full bg-white transition-transform;
+  }
+  .toggle:checked:before { transform: translateX(24px); }
+
+  .textarea {
+    @apply w-full min-h-[260px] rounded-md px-3 py-2 text-sm border bg-[var(--bg3)];
+    border-color: var(--border); color: var(--fg); font-family: var(--mono);
+  }
+  .textarea-bordered {}
+
+  .label { @apply inline-flex items-center gap-2 text-sm text-[var(--muted)]; }
+  .label-text { @apply text-[var(--muted)] text-sm; }
+
+  .table { @apply w-full text-sm border border-[var(--border)] rounded-lg overflow-hidden; }
+  .table thead th { @apply bg-[var(--bg3)] text-left px-4 py-3 border-b border-[var(--border)]; }
+  .table td { @apply px-4 py-3 border-b border-[var(--border)]; }
+  .table-zebra tbody tr:nth-child(even) { background: color-mix(in oklab, var(--bg3) 70%, transparent); }
+
+  .toast { @apply fixed right-4 bottom-4; }
+  .alert { @apply rounded-md px-4 py-3 border; border-color: var(--border); background: var(--bg3); }
+  .alert-success {
+    border-color: color-mix(in oklab, var(--accent) 50%, black);
+    color: var(--fg);
+    background: color-mix(in oklab, var(--accent) 15%, var(--bg3));
+  }
+
+  /* Lower visual noise if something ends up disabled anyway */
+  .btn[disabled], .btn:disabled {
+    opacity: .25; filter: grayscale(50%);
+    pointer-events: none;
+  }
+}
+
+/* Utilities that matched old DaisyUI names */
+.bg-base-100 { background: var(--bg2); }
+.bg-base-200 { background: var(--bg3); }
+.text-base-content\/60 { color: color-mix(in oklab, var(--fg) 60%, transparent); }
+.border-b { border-bottom: 1px solid var(--border); }
+
+.font-mono { font-family: var(--mono); }

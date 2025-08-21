@@ -1,0 +1,14 @@
+<!doctype html>
+<html>
+  <head>
+    <meta http-equiv="refresh" content="0; url=/OMNI-BUILDER/" />
+    <script>
+      // Preserve the path for client routers
+      const redirect = '/OMNI-BUILDER/' + (location.pathname + location.search + location.hash)
+        .replace(/^\/OMNI-BUILDER\//,'');
+      sessionStorage.setItem('gh-spa-path', redirect);
+      window.location.href = '/OMNI-BUILDER/';
+    </script>
+  </head>
+  <body></body>
+</html>
