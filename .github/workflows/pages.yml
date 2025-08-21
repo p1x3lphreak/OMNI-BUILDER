@@ -17,6 +17,9 @@ concurrency:
 jobs:
   build:
     runs-on: ubuntu-latest
+    env:
+      # 👇 Force Rollup to skip native binary & use JS impl (works across npm bugs)
+      ROLLUP_SKIP_NODE_JS_NATIVE: "true"
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -27,15 +30,13 @@ jobs:
           node-version: 20
           cache: 'npm'
 
-      # Work around npm optional-deps bug (rollup native bin)
-      - name: Upgrade npm (fixes npm#4828 class of issues)
+      - name: Upgrade npm (mitigate optional-deps installer bugs)
         run: npm i -g npm@latest
 
-      - name: Install dependencies (robust)
+      - name: Fresh install (no lockfile churn)
         run: |
           rm -rf node_modules
-          # Try ci first for speed; if it hits the rollup optional-deps bug, fall back
-          npm ci || (echo "npm ci failed on optional deps; retrying with npm install" && rm -f package-lock.json && npm install --no-audit --no-fund)
+          npm ci || (echo "npm ci failed; falling back to npm install" && rm -f package-lock.json && npm install --no-audit --no-fund)
 
       - name: Set build metadata env
         run: |
