@@ -18,41 +18,47 @@ jobs:
   build:
     runs-on: ubuntu-latest
     env:
-      # Ensure Rollup never tries to load a native binary on CI
+      # Force Rollup to use pure JS build (avoid native binary shenanigans)
       ROLLUP_SKIP_NODE_JS_NATIVE: "true"
     steps:
       - name: Checkout
         uses: actions/checkout@v4
 
+      # 1) Install pnpm first (adds pnpm to PATH)
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 9
+          run_install: false
+
+      # 2) Setup Node and enable pnpm cache
       - name: Setup Node
         uses: actions/setup-node@v4
         with:
           node-version: 20
-          cache: "pnpm"
+          cache: 'pnpm'
 
-      - name: Enable corepack + pnpm
-        run: |
-          corepack enable
-          corepack prepare pnpm@9 --activate
-          pnpm -v
-
-      # Clean any npm artifacts so pnpm gets a clean shot
+      # 3) Clean npm artifacts (if any) so pnpm gets a clean shot
       - name: Clean npm artifacts
         run: |
           rm -rf node_modules
           rm -f package-lock.json
 
+      # 4) Install deps with pnpm (creates pnpm-lock.yaml if missing)
       - name: Install deps (pnpm)
         run: pnpm install --no-frozen-lockfile
 
+      # 5) Build metadata env (optional nicety)
       - name: Set build metadata env
         run: |
           echo "VITE_BUILD_TIME=$(date -u +'%Y-%m-%dT%H:%M:%SZ')" >> $GITHUB_ENV
           echo "VITE_COMMIT_SHORT=${GITHUB_SHA::7}" >> $GITHUB_ENV
 
+      # 6) Build
       - name: Build
         run: pnpm run build
 
+      # 7) Ensure SPA 404 ships
       - name: Ensure SPA 404 present
         run: |
           mkdir -p dist
@@ -60,6 +66,7 @@ jobs:
             cp public/404.html dist/404.html
           fi
 
+      # 8) Upload artifact for Pages
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
         with:
